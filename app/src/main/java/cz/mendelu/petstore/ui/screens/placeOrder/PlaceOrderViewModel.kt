@@ -3,6 +3,10 @@ package cz.mendelu.petstore.ui.screens.placeOrder
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.material.icons.filled.WifiOff
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.mendelu.petstore.R
@@ -27,6 +31,13 @@ class PlaceOrderViewModel@Inject constructor(
     val _uiState = MutableStateFlow(PlaceOrderUIState())
 
     val uiState = _uiState.asStateFlow()
+
+    fun retry() {
+        _uiState.update { it.copy(
+            error = null,
+            errorIcon = null
+        ) }
+    }
 
     fun onNumberValueChange(newVal: String) {
         _uiState.update { it.copy(
@@ -54,7 +65,8 @@ class PlaceOrderViewModel@Inject constructor(
             if (id == null) {
                 _uiState.update {
                     it.copy(
-                        error = R.string.placeOrder_couldNotFIndAnAnimalToOrder
+                        error = R.string.placeOrder_couldNotFIndAnAnimalToOrder,
+                        errorIcon = Icons.Default.WarningAmber
                     )
                 }
                 Log.e("placeOrderScreen", "Id was found null while placing order" )
@@ -73,18 +85,21 @@ class PlaceOrderViewModel@Inject constructor(
                 when (val response = petsRepo.placeOrder(order = order)) {
                     CommunicationResult.ConnectionError -> {
                         _uiState.update { it.copy(
-                            error = R.string.placeOrder_noInternetConnection
+                            error = R.string.placeOrder_noInternetConnection,
+                            errorIcon = Icons.Default.WifiOff
                         ) }
                     }
                     is CommunicationResult.Error -> {
                         _uiState.update { it.copy(
-                            error = R.string.placeOrder_couldNotPlaceOrder
+                            error = R.string.placeOrder_couldNotPlaceOrder,
+                            errorIcon = Icons.Default.Repeat
                         ) }
                         Log.e("placeOrderScreen", "server error: ${response.error.code} - ${response.error.message}" )
                     }
                     is CommunicationResult.Exception -> {
                         _uiState.update { it.copy(
-                            error = R.string.placeOrder_couldNotPlaceOrder
+                            error = R.string.placeOrder_couldNotPlaceOrder,
+                            errorIcon = Icons.Default.Repeat
                         ) }
                         Log.e("placeOrderScreen", "server error: ${response.exception.message}" )
                     }

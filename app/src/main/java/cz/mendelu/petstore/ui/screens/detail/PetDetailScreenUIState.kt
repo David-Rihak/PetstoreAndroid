@@ -1,5 +1,6 @@
 package cz.mendelu.petstore.ui.screens.detail
 
+import androidx.compose.ui.graphics.vector.ImageVector
 import cz.mendelu.petstore.data.OrderStatus
 import cz.mendelu.petstore.models.Tag
 
@@ -17,6 +18,7 @@ data class PetDetailScreenUIState(
     val tagError: Int? = null,
     val nameError: Int? = null,
     val statusError: Int? = null,
+    val errorIcon: ImageVector? = null,
     val categoryError: Int? = null,
     val loggedIn: Boolean = true,
     val petNonexistentPopupShown: Boolean = false,

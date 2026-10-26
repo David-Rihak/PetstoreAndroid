@@ -9,6 +9,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
@@ -18,14 +19,34 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = primary,
+    onPrimary = dark,
+    primaryContainer = primary,
+    onPrimaryContainer = dark,
+
+
+    secondary = secondary,
+    secondaryContainer = Color(0xFFDDD0C4),
+    onSecondaryContainer = Color(0xFF2E241B),
+
+    tertiary = ternary,
+
+    background = background,
+
+    onSurface = baseText,
+    onBackground = baseText,
+    onSurfaceVariant = Color(0xFF4F4640),
+    outline = Color(0xFF80756C),
+    outlineVariant = Color(0xFFD3C8BF),
+    surfaceVariant = Color(0xFFE6DED6),
+
+    surfaceContainerLowest = Color(0xFFFFFFFF),
+    surfaceContainerLow = Color(0xFFF8F3EE),
+    surfaceContainer = Color(0xFFF3EDE7),
+    surfaceContainerHigh = Color(0xFFEFE8E1),
+    surfaceContainerHighest = cardColor
 
     /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
     onSecondary = Color.White,
     onTertiary = Color.White,
     onBackground = Color(0xFF1C1B1F),
@@ -37,7 +58,7 @@ private val LightColorScheme = lightColorScheme(
 fun PetStoreTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

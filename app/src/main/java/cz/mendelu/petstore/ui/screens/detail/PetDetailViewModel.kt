@@ -2,6 +2,11 @@ package cz.mendelu.petstore.ui.screens.detail
 
 import android.net.Uri
 import android.util.Log
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Autorenew
+import androidx.compose.material.icons.filled.NetworkWifi1Bar
+import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.WifiOff
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.mendelu.petstore.R
@@ -36,8 +41,14 @@ class PetDetailViewModel @Inject constructor(
         ) }
     }
 
-    fun loadPetDetail(id: Long) {
-        _uiState.update { it.copy(loading = true, error = null, id = id) }
+    fun loadPetDetail(id: Long?) {
+        _uiState.update { it.copy(loading = true, error = null, errorIcon = null, id = id) }
+        checkValidToken()
+        if (id == null) {
+            stopLoadingCreatingNew()
+            return
+        }
+
 
         viewModelScope.launch {
             when(val result = repository.findPetById(id)){
@@ -52,10 +63,11 @@ class PetDetailViewModel @Inject constructor(
                     ) }
 
                 CommunicationResult.ConnectionError ->
-                    _uiState.update { it.copy(loading = false, error = R.string.no_internet_connection) }
-                is CommunicationResult.Error,
+                    _uiState.update { it.copy(loading = false, error = R.string.no_internet_connection, errorIcon = Icons.Default.WifiOff) }
+                is CommunicationResult.Error ->
+                    _uiState.update { it.copy(loading = false, error = R.string.failed_to_load_pet, errorIcon = Icons.Default.Repeat) }
                 is CommunicationResult.Exception ->
-                    _uiState.update { it.copy(loading = false, error = R.string.failed_to_load_pet) }
+                    _uiState.update { it.copy(loading = false, error = R.string.failed_to_load_pet, errorIcon = Icons.Default.Repeat) }
             }
         }
     }
@@ -99,12 +111,15 @@ class PetDetailViewModel @Inject constructor(
             if (id != null) {
                 when (val response = repository.deletePet(id = id)) {
                     CommunicationResult.ConnectionError -> {
+                        _uiState.update { it.copy(loading = false, error = R.string.no_internet_connection, errorIcon = Icons.Default.WifiOff) }
                         Log.e("PetAddEdit", "network error while removing pet")
                     }
                     is CommunicationResult.Error -> {
+                        _uiState.update { it.copy(loading = false, error = R.string.failed_to_load_pet, errorIcon = Icons.Default.Repeat) }
                         Log.e("PetAddEdit", "server error while removing pet: ${response.error.code}: ${response.error.message}")
                     }
                     is CommunicationResult.Exception ->  {
+                        _uiState.update { it.copy(loading = false, error = R.string.failed_to_load_pet, errorIcon = Icons.Default.Repeat) }
                         Log.e("PetAddEdit", "exeption while removing pet: ${response.exception.message}")
                     }
                     is CommunicationResult.Success -> {
@@ -211,13 +226,22 @@ class PetDetailViewModel @Inject constructor(
                 when ( val response: CommunicationResult<Pet> = repository.findPetById(id = id) ) {
                     CommunicationResult.ConnectionError -> {
                         _uiState.update { it.copy(
-                            error = R.string.detail_connectionIssue
+                            error = R.string.detail_connectionIssue,
+                            errorIcon = Icons.Default.WifiOff
                         ) }
                     }
                     is CommunicationResult.Error -> {
+                        _uiState.update { it.copy(
+                            error = R.string.detail_couldNotSave,
+                            errorIcon = Icons.Default.Repeat
+                        ) }
                         Log.d("PetAddEdit","comRes Error while finding by pet id: code ${response.error.code}: ${response.error.message}")
                     }
                     is CommunicationResult.Exception -> {
+                        _uiState.update { it.copy(
+                            error = R.string.detail_couldNotSave,
+                            errorIcon = Icons.Default.Repeat
+                        ) }
                         Log.d("PetAddEdit","comRes Exception while finding by pet id: ${response.exception.message}")
                     }
                     is CommunicationResult.Success -> {
@@ -253,13 +277,22 @@ class PetDetailViewModel @Inject constructor(
                 )) {
                     CommunicationResult.ConnectionError -> {
                         _uiState.update { it.copy(
-                            error = R.string.detail_connectionIssue
+                            error = R.string.detail_connectionIssue,
+                            errorIcon = Icons.Default.WifiOff
                         ) }
                     }
                     is CommunicationResult.Error -> {
+                        _uiState.update { it.copy(
+                            error = R.string.detail_couldNotSave,
+                            errorIcon = Icons.Default.Repeat
+                        ) }
                         Log.d("PetAddEdit","comRes Error while finding by pet id: code ${response.error.code}: ${response.error.message}")
                     }
                     is CommunicationResult.Exception -> {
+                        _uiState.update { it.copy(
+                            error = R.string.detail_couldNotSave,
+                            errorIcon = Icons.Default.Repeat
+                        ) }
                         Log.d("PetAddEdit","comRes Exception while finding by pet id: ${response.exception.message}")
                     }
                     is CommunicationResult.Success -> {

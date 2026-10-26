@@ -1,6 +1,10 @@
 package cz.mendelu.petstore.ui.screens.orderDetail
 
 import android.util.Log
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.material.icons.filled.WifiOff
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.mendelu.petstore.R
@@ -23,31 +27,38 @@ class OrderDetailViewModel@Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     fun loadOrder(id: Long?) {
+
         if (id == null) {
             _uiState.update { it.copy(
-                error = R.string.orderDetail_couldNotFIndOrder
+                error = R.string.orderDetail_couldNotFIndOrder,
+                errorIcon = Icons.Default.WarningAmber
             ) }
             return
         }
         viewModelScope.launch {
             _uiState.update { it.copy(
-                loading = true
+                loading = true,
+                error = null,
+                errorIcon = null
             ) }
             when(val response = petsRepo.viewOrder(id)) {
                 is CommunicationResult.ConnectionError -> {
                     _uiState.update { it.copy(
-                        error = R.string.orderDetail_noInternetConnection
+                        error = R.string.orderDetail_noInternetConnection,
+                        errorIcon = Icons.Default.WifiOff
                     ) }
                 }
                 is CommunicationResult.Error -> {
                     _uiState.update { it.copy(
-                        error = R.string.orderDetail_couldNotFIndOrder
+                        error = R.string.orderDetail_couldNotFIndOrder,
+                        errorIcon = Icons.Default.Repeat
                     ) }
                     Log.e("orderDetailScreen", "server error: code:${response.error.code}, message: ${response.error.message}" )
                 }
                 is CommunicationResult.Exception -> {
                     _uiState.update { it.copy(
-                        error = R.string.orderDetail_couldNotFIndOrder
+                        error = R.string.orderDetail_couldNotFIndOrder,
+                        errorIcon = Icons.Default.Repeat
                     ) }
                     Log.e("orderDetailScreen", "server error: ${response.exception.message}" )
                 }
@@ -66,7 +77,8 @@ class OrderDetailViewModel@Inject constructor(
     fun deleteOrder(id: Long?) {
         if (id == null) {
             _uiState.update { it.copy(
-                error = R.string.orderDetail_couldNotDeleteOrder
+                error = R.string.orderDetail_couldNotDeleteOrder,
+                errorIcon = Icons.Default.Repeat
             ) }
             return
         }
@@ -75,18 +87,21 @@ class OrderDetailViewModel@Inject constructor(
          when (val response = petsRepo.deleteOrder(id)) {
              is CommunicationResult.ConnectionError -> {
                  _uiState.update { it.copy(
-                     error = R.string.orderDetail_noInternetConnection
+                     error = R.string.orderDetail_noInternetConnection,
+                     errorIcon = Icons.Default.WifiOff
                  ) }
              }
              is CommunicationResult.Error -> {
                  _uiState.update { it.copy(
-                     error = R.string.orderDetail_couldNotDeleteOrder
+                     error = R.string.orderDetail_couldNotDeleteOrder,
+                     errorIcon = Icons.Default.Repeat
                  ) }
                  Log.e("orderDetailScreen", "server error: code:${response.error.code}, message: ${response.error.message}" )
              }
              is CommunicationResult.Exception -> {
                  _uiState.update { it.copy(
-                     error = R.string.orderDetail_couldNotDeleteOrder
+                     error = R.string.orderDetail_couldNotDeleteOrder,
+                     errorIcon = Icons.Default.Repeat
                  ) }
                  Log.e("orderDetailScreen", "server error: ${response.exception.message}" )
              }

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.HideImage
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +32,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import cz.mendelu.petstore.R
+import cz.mendelu.petstore.ui.theme.basicMargin
+import cz.mendelu.petstore.ui.theme.basicRadius
+import cz.mendelu.petstore.ui.theme.halfMargin
+import cz.mendelu.petstore.ui.theme.largeRadius
 
 @Composable
 fun ImageCarousel(
@@ -40,23 +45,21 @@ fun ImageCarousel(
 ){
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+        horizontalArrangement = Arrangement.spacedBy(halfMargin()),
+        contentPadding = PaddingValues(horizontal = basicMargin(), vertical = halfMargin())
     ) {
         itemsIndexed(imageUrls) { index, imageUrl ->
             Box(
                 modifier = Modifier
                     .size(200.dp)
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(largeRadius()))
                     .background(Color.LightGray)
             ) {
                 SubcomposeAsyncImage(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
                         .fillMaxSize(),
                     model = imageUrl,
-                    contentScale = ContentScale.FillBounds,
+                    contentScale = ContentScale.Crop,
                     contentDescription = stringResource(R.string.pet_image),
                     loading = {
                         Box(Modifier.fillMaxSize(), Alignment.Center) {
@@ -66,29 +69,35 @@ fun ImageCarousel(
                     error = {
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
+                                .clip(RoundedCornerShape(basicRadius()))
                                 .fillMaxSize()
-                                .background(color = Color.LightGray),
+                                .background(color = MaterialTheme.colorScheme.surfaceVariant),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Default.HideImage, contentDescription = stringResource(R.string.petNoImage), modifier=Modifier.size(50.dp))
+                            Icon(Icons.Default.HideImage, contentDescription = stringResource(R.string.petNoImage), modifier=Modifier.size(50.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 )
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                    contentAlignment = Alignment.TopEnd) {
-                    IconButton(
-                        onClick = { onRemoveImageClick(index) },
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(halfMargin())
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .clickable { onRemoveImageClick(index) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
                         modifier = Modifier
-                            .size(20.dp)
-                            .background(Color.Black.copy(alpha = 0.6f), shape = CircleShape)
+                            .size(32.dp)
+                            .background(Color.Black.copy(alpha = 0.5f), CircleShape),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Remove image",
+                            contentDescription = stringResource(R.string.remove_image),
                             tint = Color.White,
+                            modifier = Modifier.size(16.dp)
                         )
                     }
                 }
@@ -102,15 +111,16 @@ fun ImageCarousel(
                 modifier = Modifier
                     .size(200.dp)
                     .aspectRatio(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.LightGray)
+                    .clip(RoundedCornerShape(largeRadius()))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
                     .clickable { onAddImageClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = stringResource(R.string.add_image),
-                    modifier = Modifier.size(50.dp)
+                    modifier = Modifier.size(50.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

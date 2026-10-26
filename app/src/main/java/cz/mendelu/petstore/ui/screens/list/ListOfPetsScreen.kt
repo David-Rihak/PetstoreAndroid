@@ -58,7 +58,10 @@ fun ListOfPetsScreen(
         topBarText = stringResource(R.string.list_of_pets),
         showLoading = state.loading,
         placeholderScreenContent = if (state.error != null) PlaceholderScreenContent(
-            title = stringResource(state.error!!)
+            title = stringResource(state.error!!),
+            icon = state.errorIcon,
+            onButtonClick = viewModel::onRefresh,
+            buttonText = stringResource(R.string.retry)
         ) else {null},
         actions = {
             ProfileIcon(onClick = { navRouter.toProfile() })

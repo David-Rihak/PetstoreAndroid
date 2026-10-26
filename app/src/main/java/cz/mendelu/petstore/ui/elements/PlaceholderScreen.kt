@@ -8,22 +8,28 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cz.mendelu.petstore.ui.theme.basicMargin
+import cz.mendelu.petstore.ui.theme.basicRadius
 
 data class PlaceholderScreenContent(
-    val image: Int? = null,
+    val icon: ImageVector? = null,
     val title: String? = null,
     val text: String? = null,
     val buttonText: String? = null,
@@ -43,13 +49,11 @@ fun PlaceHolderScreen(
                 .align(Alignment.Center)
                 .padding(basicMargin()),
         ) {
-            if (content.image != null) {
-                Image(
-                    contentScale = ContentScale.FillWidth,
-                    modifier = Modifier
-                        .width(300.dp),
-                    painter = painterResource(id = content.image),
+            if (content.icon != null) {
+                Icon(
+                    imageVector = content.icon,
                     contentDescription = null,
+                    modifier = Modifier.size(100.dp)
                 )
             }
 
@@ -59,8 +63,6 @@ fun PlaceHolderScreen(
                     text = content.title,
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
-                    // Theme colours instead of hardcoded black/grey, so the placeholder
-                    // stays readable in dark mode.
                     color = MaterialTheme.colorScheme.onBackground,
                 )
             }
@@ -79,7 +81,10 @@ fun PlaceHolderScreen(
             val onButtonClick = content.onButtonClick
             if (buttonText != null && onButtonClick != null) {
                 Spacer(modifier = Modifier.height(basicMargin()))
-                OutlinedButton(onClick = onButtonClick) {
+                Button(
+                    onClick = onButtonClick,
+                    shape = RoundedCornerShape(basicRadius())
+                ) {
                     Text(text = buttonText)
                 }
             }

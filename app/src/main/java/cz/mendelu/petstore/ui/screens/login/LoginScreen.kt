@@ -5,21 +5,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SecureTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,18 +27,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.mendelu.petstore.R
-import cz.mendelu.petstore.communication.IPetsRemoteRepository
 import cz.mendelu.petstore.navigation.INavigationRouter
 import cz.mendelu.petstore.ui.elements.BaseScreen
 import cz.mendelu.petstore.ui.theme.basicMargin
 import cz.mendelu.petstore.ui.theme.basicRadius
-import cz.mendelu.petstore.ui.theme.buttonStyle
-import cz.mendelu.petstore.ui.theme.cardColor
 import cz.mendelu.petstore.ui.theme.fullCardElevation
-import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun LoginScreen(
@@ -110,7 +100,6 @@ fun LoginScreenContent(
             ) {
                 Card(
                     shape = RoundedCornerShape(basicRadius()),
-                    colors = CardDefaults.cardColors(containerColor = cardColor),
                     elevation = CardDefaults.cardElevation(defaultElevation = fullCardElevation())
                 ) {
                     Column(
@@ -144,7 +133,6 @@ fun LoginScreenContent(
                     onClick = {
                         loginConfirm()
                     },
-                    colors = buttonStyle,
                     shape = RoundedCornerShape(basicRadius())
                 ) {
                     Text(stringResource(R.string.login_button))

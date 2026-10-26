@@ -69,5 +69,9 @@
     <string name="label_completed">Completed</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="detail_removeTag">Remove tag</string>
+    <string name="detail_couldNotSave">Could not save. Try again later</string>
+    <string name="retry">Retry</string>
+    <string name="remove_image">Remove image</string>
 
 </resources>

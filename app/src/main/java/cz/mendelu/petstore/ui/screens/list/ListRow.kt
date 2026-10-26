@@ -19,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,16 +32,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
-import coil3.compose.SubcomposeAsyncImageContent
 import cz.mendelu.petstore.R
 import cz.mendelu.petstore.models.Pet
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.autofill.contentType
 import cz.mendelu.petstore.ui.theme.basicMargin
 import cz.mendelu.petstore.ui.theme.basicRadius
-import cz.mendelu.petstore.ui.theme.cardColor
 import cz.mendelu.petstore.ui.theme.fullCardElevation
 import cz.mendelu.petstore.ui.theme.halfMargin
 
@@ -55,7 +51,6 @@ fun ListRow(
             .clickable(onClick = { onClick() })
             .fillMaxWidth(0.95f),
         shape = RoundedCornerShape(basicRadius()),
-        colors = CardDefaults.cardColors(containerColor = cardColor),
         elevation = CardDefaults.cardElevation(defaultElevation = fullCardElevation())
     ) {
 
@@ -84,10 +79,10 @@ fun ListRow(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
                                 .size(60.dp)
-                                .background(color = Color.LightGray),
+                                .background(color = MaterialTheme.colorScheme.surfaceVariant),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Default.HideImage, contentDescription = stringResource(R.string.petNoImage))
+                            Icon(Icons.Default.HideImage, contentDescription = stringResource(R.string.petNoImage), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 )

@@ -21,22 +21,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import cz.mendelu.petstore.R
 import cz.mendelu.petstore.models.Order
 import cz.mendelu.petstore.navigation.INavigationRouter
 import cz.mendelu.petstore.ui.elements.BaseScreen
 import cz.mendelu.petstore.ui.elements.PlaceholderScreenContent
-import cz.mendelu.petstore.ui.screens.placeOrder.PlaceOrderScreenContent
 import cz.mendelu.petstore.ui.theme.basicMargin
 import cz.mendelu.petstore.ui.theme.basicRadius
-import cz.mendelu.petstore.ui.theme.cardColor
 import cz.mendelu.petstore.ui.theme.fullCardElevation
 import cz.mendelu.petstore.ui.theme.quarterMargin
-import cz.mendelu.petstore.ui.theme.titleStyle
 
 @Composable
 fun OrderDetailScreen(
@@ -50,10 +45,22 @@ fun OrderDetailScreen(
         viewModel.loadOrder(id)
     }
 
+    if (state.orderDeleted) {
+        navRouter.navigateToListOfPetsScreen()
+    }
+
     BaseScreen(
         topBarText = stringResource(R.string.orderDetail_title, id.toString()),
         showLoading = state.loading,
-        placeholderScreenContent = state.error?.let { PlaceholderScreenContent(title = stringResource(it)) },
+        placeholderScreenContent = state.error?.let {
+            PlaceholderScreenContent(
+                title = stringResource(it),
+                icon = state.errorIcon,
+                onButtonClick = if (id != null) { { viewModel.loadOrder(id = id) } } else null,
+                buttonText = stringResource(R.string.retry)
+
+            )
+        },
         onBackClick = navRouter::navigateToListOfPetsScreen
     ) {
         OrderDetailScreenContent(
@@ -75,25 +82,25 @@ fun OrderDetailScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padVals),
-        verticalArrangement = Arrangement.SpaceBetween
+            .padding(padVals)
+            .padding(basicMargin()),
+        verticalArrangement = Arrangement.spacedBy(basicMargin())
     ) {
         order?.let {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(basicRadius()),
-                colors = CardDefaults.cardColors(containerColor = cardColor),
                 elevation = CardDefaults.cardElevation(defaultElevation = fullCardElevation())
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(basicMargin()),
                     verticalArrangement = Arrangement.spacedBy(basicMargin())
                 ) {
                     Text(
-                        text = "Order Details",
-                        style = titleStyle
+                        text = stringResource(R.string.orderDetail_title),
+                        style = MaterialTheme.typography.titleMedium
                     )
 
                     Spacer(modifier = Modifier.height(quarterMargin()))
@@ -109,7 +116,7 @@ fun OrderDetailScreenContent(
 
         Button(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(basicRadius()),
             onClick = onDelete
         ) {
             Text(stringResource(R.string.placeOrder_placeOrderLabel))

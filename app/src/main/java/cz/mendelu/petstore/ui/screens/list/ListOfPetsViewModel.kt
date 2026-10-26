@@ -1,6 +1,9 @@
 package cz.mendelu.petstore.ui.screens.list
 
 import android.util.Log
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.WifiOff
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.mendelu.petstore.R
@@ -44,18 +47,33 @@ class ListOfPetsViewModel @Inject constructor(
 
     fun loadPets(withLoading: Boolean = true){
 
-        _uiState.update { it.copy(loading = (withLoading), error = null) }
+        _uiState.update { it.copy(loading = (withLoading), error = null, errorIcon = null) }
 
         viewModelScope.launch {
             when(val result = repository.findByStatus("available")){
                 is CommunicationResult.Success ->
                     _uiState.update { it.copy(loading = false, pets = result.data) }
 
-                CommunicationResult.ConnectionError ->
-                    _uiState.update { it.copy(loading = false, error = R.string.no_internet_connection) }
-                is CommunicationResult.Error,
+                CommunicationResult.ConnectionError -> {
+                    _uiState.update { it.copy(
+                        loading = false,
+                        error = R.string.no_internet_connection,
+                        errorIcon = Icons.Default.WifiOff
+                    ) }
+                }
+                is CommunicationResult.Error -> {
+                    _uiState.update { it.copy(
+                        loading = false,
+                        error = R.string.failed_to_load_pets,
+                        errorIcon = Icons.Default.Repeat
+                    ) }
+                }
                 is CommunicationResult.Exception ->
-                    _uiState.update { it.copy(loading = false, error = R.string.failed_to_load_pets) }
+                _uiState.update { it.copy(
+                    loading = false,
+                    error = R.string.failed_to_load_pets,
+                    errorIcon = Icons.Default.Repeat
+                ) }
             }
         }
     }

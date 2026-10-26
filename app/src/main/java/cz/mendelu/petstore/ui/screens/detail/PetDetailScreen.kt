@@ -12,36 +12,29 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.HideImage
 import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,16 +42,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import coil3.compose.SubcomposeAsyncImage
 import cz.mendelu.petstore.R
 import cz.mendelu.petstore.data.PetStatus
 import cz.mendelu.petstore.models.Tag
@@ -66,21 +55,12 @@ import cz.mendelu.petstore.navigation.INavigationRouter
 import cz.mendelu.petstore.ui.elements.BaseScreen
 import cz.mendelu.petstore.ui.elements.PlaceholderScreenContent
 import cz.mendelu.petstore.ui.elements.ProfileIcon
-import cz.mendelu.petstore.ui.theme.background
 import cz.mendelu.petstore.ui.theme.basicMargin
 import cz.mendelu.petstore.ui.theme.basicRadius
-import cz.mendelu.petstore.ui.theme.buttonStyle
-import cz.mendelu.petstore.ui.theme.cardColor
 import cz.mendelu.petstore.ui.theme.fullCardElevation
 import cz.mendelu.petstore.ui.theme.halfMargin
 import cz.mendelu.petstore.ui.theme.halfRadius
-import cz.mendelu.petstore.ui.theme.primary
 import cz.mendelu.petstore.ui.theme.quarterMargin
-import cz.mendelu.petstore.ui.theme.quarterRadius
-import cz.mendelu.petstore.ui.theme.secondary
-import cz.mendelu.petstore.ui.theme.text
-import cz.mendelu.petstore.ui.theme.titleStyle
-import java.util.HexFormat
 
 const val TestTagPetDetailName = "TestTagPetDetailName"
 
@@ -92,19 +72,17 @@ fun PetDetailScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val focusManager = LocalFocusManager.current
+
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
+        focusManager.clearFocus()
         uri?.let { viewModel.onImageAdd(it) }
     }
 
     LaunchedEffect(id) {
-        if (id != null) {
-            viewModel.loadPetDetail(id)
-        } else {
-            viewModel.stopLoadingCreatingNew()
-        }
-        viewModel.checkValidToken()
+        viewModel.loadPetDetail(id)
     }
     if(!state.loggedIn) {
         navRouter.toLogin()
@@ -120,7 +98,10 @@ fun PetDetailScreen(
         onBackClick = navRouter::returnBack,
         showLoading = state.loading,
         placeholderScreenContent = if (state.error != null) PlaceholderScreenContent(
-            title = stringResource(state.error!!)
+            title = stringResource(state.error!!),
+            icon = state.errorIcon,
+            onButtonClick = { viewModel.loadPetDetail(id = id) },
+            buttonText = stringResource(R.string.retry)
         ) else {null},
         actions = {
             if (id != null) {
@@ -161,9 +142,11 @@ fun PetDetailScreen(
                 viewModel.removeTag(id)
             },
             onTagSave = {
+                focusManager.clearFocus()
                 viewModel.addNewTag()
             },
             onTagValueChange = { value ->
+
                 viewModel.onTagValueChange(value)
             },
             tagError = state.tagError,
@@ -230,17 +213,17 @@ fun PetDetailScreenContent(
     ) {
         Card(
             shape = RoundedCornerShape(halfMargin()),
-            colors = CardDefaults.cardColors(containerColor = cardColor),
             elevation = CardDefaults.cardElevation(defaultElevation = fullCardElevation())
         ) {
             Column(
                 modifier = Modifier.padding(basicMargin()),
                 verticalArrangement = Arrangement.spacedBy(halfMargin())
             ) {
-                Text(stringResource(R.string.title_about), style = titleStyle)
+                Text(stringResource(R.string.title_about), style = MaterialTheme.typography.titleMedium )
                 Spacer(modifier = Modifier.height(basicMargin()))
 
                 OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
                     value = name,
                     onValueChange = { onNameValueChange(it) },
                     label = { Text(text = stringResource(R.string.name_label)) },
@@ -248,18 +231,18 @@ fun PetDetailScreenContent(
                     supportingText = {
                         if (nameError != null) Text(stringResource(R.string.detail_nameError))
                     },
-                    modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                 )
 
                 Spacer(modifier = Modifier.height(basicMargin()))
 
                 OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
                     value = category,
                     onValueChange = {onCategoryValueChange(it)},
+                    label={Text(stringResource(R.string.detail_categoryLabel))},
                     isError = categoryError!=null,
-                    supportingText = {if (categoryError != null) Text(stringResource(categoryError))},
-                    label={Text(stringResource(R.string.detail_categoryLabel))}
+                    supportingText = {if (categoryError != null) Text(stringResource(categoryError))}
                 )
             }
 
@@ -267,7 +250,6 @@ fun PetDetailScreenContent(
 
         Card(
             shape = RoundedCornerShape(halfMargin()),
-            colors = CardDefaults.cardColors(containerColor = cardColor),
             elevation = CardDefaults.cardElevation(defaultElevation = fullCardElevation())
         ) {
             Column(
@@ -276,7 +258,7 @@ fun PetDetailScreenContent(
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(halfMargin())
             ) {
-                Text(stringResource(R.string.title_category), style = titleStyle)
+                Text(stringResource(R.string.label_status), style = MaterialTheme.typography.titleMedium)
 
                 Spacer(modifier = Modifier.height(basicMargin()))
                 Box(
@@ -311,9 +293,12 @@ fun PetDetailScreenContent(
                         Text(if (status.isBlank()) stringResource(R.string.none) else status)
                         PetStatus.entries.forEach { petStatus ->
                             DropdownMenuItem(
-                                modifier = Modifier.fillMaxWidth(0.5f),
+                                modifier = Modifier.fillMaxWidth(),
                                 text = { Text(petStatus.name) },
-                                onClick = {onStatusValueChange(petStatus.name)}
+                                onClick = {
+                                    onStatusValueChange(petStatus.name)
+                                    setStatusDDMExpanded(false)
+                                }
                             )
                         }
                     }
@@ -327,7 +312,6 @@ fun PetDetailScreenContent(
 
         Card(
             shape = RoundedCornerShape(halfMargin()),
-            colors = CardDefaults.cardColors(containerColor = cardColor),
             elevation = CardDefaults.cardElevation(defaultElevation = fullCardElevation())
         ) {
             Column(
@@ -336,7 +320,7 @@ fun PetDetailScreenContent(
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(halfMargin())
             ) {
-                Text(stringResource(R.string.detail_tagsLabel), style = titleStyle)
+                Text(stringResource(R.string.detail_tagsLabel), style = MaterialTheme.typography.titleMedium)
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -344,7 +328,7 @@ fun PetDetailScreenContent(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth(0.5f),
+                        modifier = Modifier.weight(6f),
                         label = { Text(stringResource(R.string.tag_label)) },
                         value = tag,
                         onValueChange = {
@@ -355,11 +339,13 @@ fun PetDetailScreenContent(
                             tagError?.let { Text(stringResource(it)) }
                         }
                     )
+                    Spacer(Modifier.width(basicMargin()))
                     Button(
                         onClick = onTagSave,
-                        modifier = Modifier.padding(bottom = quarterMargin()),
-                        shape = RoundedCornerShape(basicRadius()),
-                        colors = buttonStyle
+                        modifier = Modifier
+                            .padding(bottom = quarterMargin())
+                            .weight(3f),
+                        shape = RoundedCornerShape(basicRadius())
                     ) {
                         Text(stringResource(R.string.detail_addTag))
                     }
@@ -373,13 +359,19 @@ fun PetDetailScreenContent(
                     tags.forEach { tag ->
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(basicRadius()))
-                                .background(color = secondary)
+                                .clip(RoundedCornerShape(100))
+                                .background(color = MaterialTheme.colorScheme.secondary)
                                 .clickable(onClick = { if (tag.id != null) onTagRemove(tag.id) })
                                 .padding(horizontal = basicMargin(), vertical = halfMargin()),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(tag.name?:stringResource(R.string.none), color = Color.White)
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(halfMargin()),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(tag.name?:stringResource(R.string.none), color = Color.White)
+                                Icon(Icons.Default.Close, contentDescription = stringResource(R.string.detail_removeTag), tint = Color.White)
+                            }
                         }
                     }
                 }
@@ -404,8 +396,8 @@ fun PetDetailScreenContent(
 
             if (onRemovePetClick != null) {
                 Button(
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError),
                     onClick = onRemovePetClick,
-                    colors = buttonStyle.copy(containerColor = Color.Red),
                     shape = RoundedCornerShape(basicRadius())
                 ) {
                     Text(stringResource(R.string.detail_removePetLabel))
@@ -413,7 +405,6 @@ fun PetDetailScreenContent(
             }
             Button(
                 onClick = onSave,
-                colors = buttonStyle,
                 shape = RoundedCornerShape(basicRadius())
             ) {
                 Text(saveButtonText)

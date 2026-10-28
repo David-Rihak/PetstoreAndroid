@@ -32,6 +32,7 @@ import cz.mendelu.petstore.ui.theme.basicMargin
 import cz.mendelu.petstore.ui.theme.basicRadius
 import cz.mendelu.petstore.ui.theme.fullCardElevation
 import cz.mendelu.petstore.ui.theme.quarterMargin
+import java.util.Locale
 
 @Composable
 fun OrderDetailScreen(
@@ -106,7 +107,7 @@ fun OrderDetailScreenContent(
                     Spacer(modifier = Modifier.height(quarterMargin()))
 
                     OrderDetailRow(label = stringResource(R.string.label_quantity), value = it.quantity.toString())
-                    OrderDetailRow(label = stringResource(R.string.label_shipDate), value = it.shipDate)
+                    OrderDetailRow(label = stringResource(R.string.label_shipDate), value = it.shipDate.format("dd.MM.YYYY"))
                     OrderDetailRow(label = stringResource(R.string.label_status), value = it.status)
                     OrderDetailRow(label = stringResource(R.string.label_completed), value = if (it.complete) stringResource(R.string.yes) else stringResource(R.string.no)
                     )
@@ -119,7 +120,7 @@ fun OrderDetailScreenContent(
             shape = RoundedCornerShape(basicRadius()),
             onClick = onDelete
         ) {
-            Text(stringResource(R.string.placeOrder_placeOrderLabel))
+            Text(stringResource(R.string.orderDetail_removeOrder))
         }
     }
 }

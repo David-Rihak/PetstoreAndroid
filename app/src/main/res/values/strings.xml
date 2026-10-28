@@ -73,5 +73,6 @@
     <string name="detail_couldNotSave">Could not save. Try again later</string>
     <string name="retry">Retry</string>
     <string name="remove_image">Remove image</string>
+    <string name="orderDetail_removeOrder">Remove this order</string>
 
 </resources>
